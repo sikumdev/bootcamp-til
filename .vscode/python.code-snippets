@@ -1,0 +1,75 @@
+{
+  "TIL 노트 템플릿": {
+    "prefix": "til",
+    "scope": "python",
+    "body": [
+      "\"\"\"",
+      "title: $1",
+      "tags: [$2]",
+      "\"\"\"",
+      "",
+      "#== ${3:섹션 제목}",
+      "",
+      "#> ${4:설명}",
+      "",
+      "$0",
+      "",
+      "#! ${5:막혔던 부분}",
+      "",
+      "#? ${6:나중에 볼 것}"
+    ],
+    "description": "부트캠프 TIL 노트 기본 틀 (Tab으로 칸 이동)"
+  },
+
+  "섹션 제목 (#==)": {
+    "prefix": "sec",
+    "scope": "python",
+    "body": ["#== $0"],
+    "description": "섹션 제목"
+  },
+
+  "설명 (#>)": {
+    "prefix": "desc",
+    "scope": "python",
+    "body": ["#> $0"],
+    "description": "설명 문단"
+  },
+
+  "막혔던 부분 (#!)": {
+    "prefix": "stuck",
+    "scope": "python",
+    "body": ["#! $0"],
+    "description": "막혔던 부분 (경고 박스)"
+  },
+
+  "나중에 볼 것 (#?)": {
+    "prefix": "todo",
+    "scope": "python",
+    "body": ["#? $0"],
+    "description": "나중에 볼 것 (체크박스)"
+  },
+
+  "공부할 주제 (#@@@)": {
+    "prefix": "issue",
+    "scope": "python",
+    "body": ["#@@@ $0"],
+    "description": "따로 팔 큰 주제 (GitHub 이슈)"
+  },
+
+  "코드 옆 접이식 설명 (#(1))": {
+    "prefix": "fold",
+    "scope": "python",
+    "body": [
+      "#(${1:1})",
+      "#(${1:1})> $0"
+    ],
+    "description": "코드 옆 접이식 주석 마커 + 설명 줄"
+  },
+
+  "접이식 설명 이어쓰기 (#(1)>)": {
+    "prefix": "fold+",
+    "scope": "python",
+    "body": ["#(${1:1})> $0"],
+    "description": "접이식 설명 다음 줄"
+  }
+}

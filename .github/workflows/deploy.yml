@@ -1,0 +1,52 @@
+name: build-and-deploy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write   # gh-pages 브랜치에 배포
+  issues: write     # #@@@ 마커로 이슈 생성
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # 1) 실습 .py -> 학습 노트 .md 변환
+      - name: 노트 변환
+        run: |
+          files=$(find docs -name '*.py')
+          if [ -n "$files" ]; then
+            python tools/py2md.py $files
+          fi
+
+      # 2) #@@@ 주제 -> GitHub 이슈 (중복은 자동으로 건너뜀)
+      - name: 공부 주제 이슈 생성
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          files=$(find docs -name '*.py')
+          if [ -n "$files" ]; then
+            python tools/issue_extract.py $files > issues.json
+            python - << 'PY'
+          import json, subprocess, pathlib
+          data = json.loads(pathlib.Path("issues.json").read_text(encoding="utf-8"))
+          for it in data:
+              subprocess.run(["gh","issue","create",
+                  "--title", it["title"],
+                  "--body",  it["body"],
+                  "--label", ",".join(it["labels"])], check=False)
+          PY
+          fi
+
+      # 3) 사이트 빌드 & 배포
+      - name: 배포
+        run: |
+          pip install mkdocs-material
+          mkdocs gh-deploy --force

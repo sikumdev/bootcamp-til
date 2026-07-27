@@ -1,0 +1,56 @@
+site_name: 부트캠프 TIL
+site_description: 부트캠프 학습 정리
+# 아래 두 줄은 본인 값으로 바꾸세요 (레포 Settings > Pages 주소와 동일)
+site_url: https://siyeonkim99.github.io/TIL/
+repo_url: https://github.com/siyeonkim99/TIL
+
+theme:
+  name: material
+  language: ko
+  palette:
+    - scheme: default
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: 다크 모드로
+    - scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: 라이트 모드로
+  features:
+    - navigation.sections   # 사이드바를 주차별로 묶어서 보여줌
+    - navigation.top        # 위로 가기 버튼
+    - navigation.footer     # 이전/다음 페이지
+    - search.suggest
+    - search.highlight
+    - content.code.copy     # 코드 복사 버튼
+    - content.code.annotate # #(1)! 접이식 주석
+
+markdown_extensions:
+  - attr_list               # 코드 접이식 주석에 필요
+  - md_in_html              # 코드 접이식 주석에 필요
+  - admonition              # !!! warning 박스
+  - pymdownx.details        # 접이식 박스
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.snippets:      # --8<-- 로 코드 파일 직접 끌어오기
+      base_path: ["docs"]
+  - pymdownx.tasklist:      # - [ ] 체크박스
+      custom_checkbox: true
+  - toc:
+      permalink: true
+
+plugins:
+  - search:
+      lang: ko
+  - tags
+
+# nav 를 직접 안 써도 파일 구조대로 사이드바가 생깁니다.
+# 순서를 고정하고 싶으면 폴더/파일명 앞에 01- 02- 처럼 숫자를 붙이세요.
