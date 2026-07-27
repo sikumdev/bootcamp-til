@@ -1,8 +1,8 @@
 site_name: 부트캠프 TIL
 site_description: 부트캠프 학습 정리
 # 아래 두 줄은 본인 값으로 바꾸세요 (레포 Settings > Pages 주소와 동일)
-site_url: https://siyeonkim99.github.io/TIL/
-repo_url: https://github.com/siyeonkim99/TIL
+site_url: https://sikumdev.github.io/bootcamp-til/
+repo_url: https://github.com/sikumdev/bootcamp-til
 
 theme:
   name: material
