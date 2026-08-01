@@ -52,5 +52,10 @@ plugins:
       lang: ko
   - tags
 
+extra_css:
+  - stylesheets/til.css
+extra_javascript:
+  - javascripts/til-click.js
+
 # nav 를 직접 안 써도 파일 구조대로 사이드바가 생깁니다.
 # 순서를 고정하고 싶으면 폴더/파일명 앞에 01- 02- 처럼 숫자를 붙이세요.
