@@ -1,6 +1,6 @@
 """
 title: 가변인자 — * 와 ** 
-tags: [python, 1주차]
+tags: [python]
 """
 
 #== 정의에서의 * — 모으기 (packing)

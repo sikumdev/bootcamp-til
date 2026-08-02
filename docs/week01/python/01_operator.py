@@ -1,6 +1,6 @@
 """
 title: 기본 내장 연산 함수
-tags: [python, 1주차]
+tags: [python]
 """
 
 #== 숫자 관련 내장 함수

@@ -1,6 +1,6 @@
 """
 title: 자료구조 
-tags: [python, 1주차]
+tags: [python]
 """
 
 #== 리스트 추가 (append · extend · insert)

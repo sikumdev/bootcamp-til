@@ -1,6 +1,6 @@
 """
 title: 문자열 슬라이싱과 내장 함수
-tags: [python, 1주차]
+tags: [python]
 """
 
 #== 슬라이싱
