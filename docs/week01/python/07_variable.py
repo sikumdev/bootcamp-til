@@ -1,6 +1,6 @@
 """
 title: 전역변수와 지역변수
-tags: [python, function, 1주차]
+tags: [python, 1주차]
 """
 
 #== 같은 이름 a 로 실험하기

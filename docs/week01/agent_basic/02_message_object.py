@@ -1,6 +1,6 @@
 """
 title: LangChain — Message 객체 
-tags: [langchain, ai-agent]
+tags: [langchain]
 """
 
 #== 상속 구조

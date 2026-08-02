@@ -1,6 +1,6 @@
 """
 title: 반복문 — for · enumerate · zip
-tags: [python, loop, 1주차]
+tags: [python, 1주차]
 """
 
 #== 기본 형태

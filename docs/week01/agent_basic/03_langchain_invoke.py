@@ -1,6 +1,6 @@
 """
 title: LangChain — invoke, stream
-tags: [langchain, ai-agent]
+tags: [langchain]
 """
 
 #== 대원칙

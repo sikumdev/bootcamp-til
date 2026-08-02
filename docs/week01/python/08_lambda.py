@@ -1,6 +1,6 @@
 """
 title: lambda — 한 줄짜리 함수
-tags: [python, function, 1주차]
+tags: [python, 1주차]
 """
 
 #== 문법

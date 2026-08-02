@@ -1,7 +1,7 @@
 ---
 title: AI Agent와 LangChain 기초
 date: 2026-08-02
-tags: [ai-agent, langchain]
+tags: [ai-agent]
 ---
 
 # AI Agent와 LangChain 기초

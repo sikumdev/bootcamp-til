@@ -1,6 +1,6 @@
 """
 title: 컴프리헨션
-tags: [python, comprehension, 1주차]
+tags: [python, 1주차]
 """
 #== 컴프리헨션
 # --8<-- [start]
