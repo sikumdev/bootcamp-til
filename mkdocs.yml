@@ -21,7 +21,7 @@ theme:
         icon: material/weather-sunny
         name: 라이트 모드로
   features:
-    - navigation.sections   # 사이드바를 주차별로 묶어서 보여줌
+    - navigation.indexes   # 폴더를 접었다 폈다 (현재 페이지 경로만 펼침)
     - navigation.top        # 위로 가기 버튼
     - navigation.footer     # 이전/다음 페이지
     - search.suggest

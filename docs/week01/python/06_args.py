@@ -1,5 +1,5 @@
 """
-title: 가변인자 — * 와 ** (모으기·펼치기)
+title: 가변인자 — * 와 ** 
 tags: [python, function, 1주차]
 """
 

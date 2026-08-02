@@ -1,5 +1,5 @@
 """
-title: 자료구조 — list · tuple · set · dict
+title: 자료구조 
 tags: [python, 자료구조, 1주차]
 """
 
