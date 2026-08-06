@@ -1,5 +1,5 @@
 """
-title: Runnable 4종 — Parallel · Passthrough · Lambda · Sequence
+title: Runnable 4종
 tags: [langchain]
 """
 

@@ -1,5 +1,5 @@
 """
-title: Pydantic 모델 — 구조화 출력의 틀
+title: Pydantic 모델
 tags: [langchain]
 """
 
