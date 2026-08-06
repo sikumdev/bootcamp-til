@@ -1,5 +1,5 @@
 """
-title: LCEL — 파이프 연결과 invoke · stream · batch
+title: LCEL — invoke · stream · batch
 tags: [langchain]
 """
 
