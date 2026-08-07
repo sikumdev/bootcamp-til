@@ -1,5 +1,5 @@
 """
-title: Tool 호출 — @tool · bind_tools · 4단계 루프
+title: Tool 호출 
 tags: [langchain]
 """
 

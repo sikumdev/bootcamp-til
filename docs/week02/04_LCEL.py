@@ -1,5 +1,5 @@
 """
-title: LCEL — invoke · stream · batch
+title: LCEL 
 tags: [langchain]
 """
 

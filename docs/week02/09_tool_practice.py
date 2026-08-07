@@ -1,5 +1,5 @@
 """
-title: 실전 툴 — 웹 검색 · 날짜 · 워크플로 함수
+title: 실전 툴 
 tags: [langchain]
 """
 

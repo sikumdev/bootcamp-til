@@ -1,5 +1,5 @@
 """
-title: 서비스로 묶기 — 툴 + 구조화 출력
+title: 서비스로 묶기 
 tags: [langchain]
 """
 

@@ -1,8 +1,7 @@
 """
-title: 구조화 출력 — Parser · with_structured_output · Fixing
+title: 구조화 출력 
 tags: [langchain]
 """
-
 
 #== 방법 ① PydanticOutputParser
 #> 모델한테 "이 형식으로 내놔" 라고 프롬프트에 적어서 부탁하는 방식.
