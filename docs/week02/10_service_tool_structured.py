@@ -3,8 +3,6 @@ title: 서비스로 묶기
 tags: [langchain]
 """
 
-
-
 # --8<-- [start:setup]
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
