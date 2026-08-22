@@ -26,6 +26,137 @@ conn = psycopg.connect(
 cur = conn.cursor()
 # --8<-- [end:connect]
 
+#== 커서(Cursor)가 뭐냐
+#> conn.cursor() 를 부르면 Cursor 객체가 나옴. 
+#> `Connection` → "DB 에 연결돼 있다" 는 상태. commit·rollback·close 를 담당
+#> `Cursor`     → "SQL 을 보내고 결과를 받아온다". execute·fetch 를 담당
+
+# --8<-- [start:cursor_what]
+conn = psycopg.connect(...)   # Connection 객체 — DB 와의 통로
+cur = conn.cursor()           # Cursor 객체 — 그 통로로 일을 시키는 도구
+
+# --8<-- [end:cursor_what]
+
+#! `커서의 핵심은 `지금 어디까지 읽었는지 기억한다` 는 것.`
+#! 결과가 100행이면 그걸 통째로 주는 게 아니라
+#! 책갈피를 꽂아두고 "다음 거 줘" 할 때마다 한 칸씩 넘겨줌.
+#! 그래서 conn 과 따로 있는 것. 책갈피를 들고 있을 뭔가가 필요해서.
+
+# --8<-- [start:cursor_props]
+cur.execute("SELECT 1")   # 반환값이 cur 자기 자신임
+#(1)> 그래서 conn.cursor().execute(...).fetchall() 처럼 이어 쓸 수 있음
+
+# 커서를 직접 for 로 돌려도 됨
+#(2)> fetchall() 로 다 받지 않고 한 행씩 처리 → 결과가 클 때 메모리 절약
+for row in cur:          
+    print(row)
+
+# with 로 쓰면 블록 끝에 자동으로 닫힘
+#(3)> 블록을 나오면 c.closed 가 True
+with conn.cursor() as c: 
+    c.execute("SELECT count(*) FROM b")
+    print(c.fetchone())
+
+# 커서를 안 만들고 바로 쓸 수도 있음
+#(4)> 내부에서 커서를 새로 만들어 돌려줌. 부를 때마다 다른 커서라 주의
+conn.execute("SELECT 1") 
+# --8<-- [end:cursor_props]
+
+
+#== fetchone 과 fetchall 차이
+#> 둘 다 결과를 꺼내는데, 반환 타입도 다르고 커서 위치도 다르게 움직임.
+
+# --8<-- [start:fetch_basic]
+cur.execute("SELECT id, title FROM b ORDER BY id")
+
+# "첫 행" 이 아니라 "다음 행". 부를 때마다 책갈피가 한 칸씩 이동
+cur.fetchone()   # (1, '1984')   ← 튜플 하나
+cur.fetchone()   # (2, 'Moby')   ← 다음 행
+cur.fetchone()   # (3, 'Farm')
+cur.fetchone()   # None          ← 더 없으면 None
+
+# 남은 걸 전부 꺼내고 책갈피를 끝으로 보냄. 다시 보려면 execute 를 다시
+cur.execute("SELECT id, title FROM b ORDER BY id")
+cur.fetchall()   # [(1,'1984'), (2,'Moby'), (3,'Farm')]  ← 리스트
+cur.fetchall()   # []   ← 두 번째는 빈 리스트
+# --8<-- [end:fetch_basic]
+
+# --8<-- [start:fetch_return]
+ 메서드             반환 타입        결과가 없을 때      책갈피
+ fetchone()       튜플 하나        None            한 칸 이동
+ fetchall()       튜플의 리스트     빈 리스트 []      끝으로
+ fetchmany(n)     튜플의 리스트     빈 리스트 []      n 칸 이동
+# --8<-- [end:fetch_return]
+
+#! `결과가 없을 때 반환값이 서로 다름.`
+#! `fetchone` → `None`
+#! `fetchall` → `[]`
+#!  → 그래서 판별 코드가 달라짐
+#!   row = cur.fetchone();  if row is None: ...
+#!   rows = cur.fetchall(); if not rows: ...
+
+#! 섞어 쓰면 fetchall 은 "남은 것" 만 줌.
+#! fetchone() → (1,'1984')
+#! fetchall() → [(2,'Moby'), (3,'Farm')]   ← 첫 행은 이미 꺼내서 없음
+
+# --8<-- [start:fetchmany]
+cur.execute("SELECT id, title FROM b ORDER BY id")
+cur.fetchmany(2)   # [(1,'1984'), (2,'Moby')]
+cur.fetchmany(2)   # [(3,'Farm')]           ← 남은 만큼만
+# --8<-- [end:fetchmany]
+
+#==  fetchone, fetchall, fetchmany 언제 쓰는지 
+# --8<-- [start]
+ fetchone  → 1건만 나오는 게 확실할 때 (id 로 조회, count 결과)
+ fetchall  → 건수가 적고 목록을 다 쓸 때
+ for 문     → 건수가 많아서 한 번에 메모리에 올리기 부담될 때
+ fetchmany → 대량을 덩어리 단위로 처리할 때
+# --8<-- [end]
+
+#! `SELECT count(*)` 결과가 `(3,)` 이라 값만 쓰려면 `cur.fetchone()[0]` 임.
+#! 한 칸짜리 튜플이라 [0] 을 빼먹기 쉬움.
+
+
+#== fetch 로 자주 나는 에러
+
+# --8<-- [start:fetch_error]
+cur.execute("INSERT INTO b (title) VALUES ('X')")
+
+# ProgrammingError: the last operation didn't produce records
+#(1)> INSERT·UPDATE 는 돌려줄 행이 없음. fetch 하면 에러
+#(1)> 넣은 행을 받고 싶으면 RETURNING 을 붙일 것
+cur.fetchone()   
+# --8<-- [end:fetch_error]
+
+# --8<-- [start:rowcount]
+cur.execute("UPDATE b SET title = title")
+
+# INSERT·UPDATE·DELETE 결과를 확인할 때 이걸 봄
+cur.rowcount    # 3   ← 영향받은 행 수
+
+# 결과에 어떤 열이 있는지. 튜플만 봐서는 모를 때 유용
+cur.execute("SELECT id, title FROM b LIMIT 1")
+[d.name for d in cur.description]   # ['id', 'title']
+# --8<-- [end:rowcount]
+
+
+#== row_factory 를 바꾸면 fetch 반환 타입이 바뀜
+
+# --8<-- [start:rowfactory_fetch]
+from psycopg.rows import dict_row
+
+conn = psycopg.connect(..., row_factory=dict_row)
+#(1)> 기본은 튜플, dict_row 를 걸면 딕셔너리
+#(1)> "하나냐 리스트냐" 구조는 그대로. 안에 든 것만 바뀜
+cur = conn.cursor()
+
+cur.execute("SELECT id, title FROM b ORDER BY id LIMIT 2")
+cur.fetchone()   # {'id': 1, 'title': '1984'}
+cur.fetchall()   # [{'id':1,...}, {'id':2,...}]
+# --8<-- [end:rowfactory_fetch]
+
+#! 열이 많아지면 row[0], row[3] 세는 게 실수의 근원이라 이게 편함.
+#! sqlite3 의 `conn.row_factory = sqlite3.Row` 와 같은 역할.
 
 #== placeholder 가 ? 가 아니라 %s
 
