@@ -245,7 +245,6 @@ def preprocess_korean(text, selected_tags=None, stopwords=None):
 #! 내용어 - {"데이터"}   → 데이터 빠짐
 
 
-
 #== 영어 — 토큰화 두 가지
 
 # --8<-- [start:en_tokenize]
@@ -257,22 +256,17 @@ wp = WordPunctTokenizer()
 text = "Good muffins cost $3.88 in New York. I can't wait!"
 
 tb.tokenize(text)
-#(1)> 13개 ['Good','muffins','cost','$','3.88','in','New','York.','I','ca',"n't",'wait','!']
+# 13개 ['Good','muffins','cost','$','3.88','in','New','York.','I','ca',"n't",'wait','!']
 #(1)> 3.88 을 하나로 유지. can't 를 ca + n't 로 (영어 문법 규칙)
 #(1)> ★ 'York.' 에 마침표가 붙어 있음. 문장 끝을 못 알아챈 것
 
 wp.tokenize(text)
-#(2)> 17개 ['Good','muffins','cost','$','3','.','88','in','New','York','.','I','can',"'",'t','wait','!']
+# 17개 ['Good','muffins','cost','$','3','.','88','in','New','York','.','I','can',"'",'t','wait','!']
 #(2)> 3.88 을 3 . 88 로 쪼갬. 기호를 전부 떼어냄
 # --8<-- [end:en_tokenize]
 
-#! 직접 돌려서 확인한 값임. 개수가 13 vs 17.
-
 #! `Treebank` — 영어 문법 규칙을 씀. 숫자·축약형을 살림. 보통 이걸 씀
 #! `WordPunct` — 글자 덩어리와 기호를 기계적으로 분리. 더 잘게 쪼갬
-
-#! ★ Treebank 가 `York.` 를 하나로 남긴 게 눈에 띔.
-#! 문장 단위로 먼저 자르지 않으면 이런 게 생김.
 #! → 영어도 `문장 분리 → 토큰화` 순서가 안전함.
 
 #! 한국어와 비교하면
@@ -285,13 +279,13 @@ wp.tokenize(text)
 # --8<-- [start:en_pos]
 from nltk import pos_tag
 
-pos_tag(tb.tokenize("Alice studies language models."))
-#(1)> Penn Treebank 태그. (단어, 태그) 튜플의 리스트
+# Penn Treebank 태그. (단어, 태그) 튜플의 리스트
 #(1)> [('Alice','NNP'), ('studies','NNS'), ('language','NN'), ('models','NNS'), ('.','.')]
+pos_tag(tb.tokenize("Alice studies language models."))
 
+# startswith 로 비교함. NN·NNS·NNP·NNPS 를 한 번에 잡으려고
 nouns = [w for w, t in tagged if t.startswith("NN")]
 verbs = [w for w, t in tagged if t.startswith("VB")]
-#(2)> ★ startswith 로 비교함. NN·NNS·NNP·NNPS 를 한 번에 잡으려고
 # --8<-- [end:en_pos]
 
 #! 태그 계열
@@ -300,33 +294,8 @@ verbs = [w for w, t in tagged if t.startswith("VB")]
 #! `JJ` 형용사 — JJ JJR(비교급) JJS(최상급)
 #! `RB` 부사
 
-#! ★ 한국어 base_tag 와 하는 일이 같음. 둘 다 `태그 앞부분만 보는` 것.
+#! 한국어 base_tag 와 하는 일이 같음. 둘 다 `태그 앞부분만 보는` 것.
 #! 한국어는 `-`·`+` 를 떼고, 영어는 `startswith` 로 계열을 묶음.
-
-#! `studies` 가 NNS(명사 복수)로 잡혔음. 문맥상 동사인데.
-#! 통계 모델이라 이런 실수가 있음. 100% 믿으면 안 됨.
-
-
-#== ★ 틀린 것 ③ 다른 문장의 결과를 씀
-
-# --8<-- [start:en_pos_trap]
-fill_tagged = pos_tag(tb.tokenize("Researchers build useful tools."))
-direct_tagged = pos_tag(tb.tokenize("Alice studies language models."))
-
-# ❌ 내가 쓴 것 — fill 을 씀
-[w for w, t in fill_tagged if t.startswith('N')]
-# ['Researchers', 'tools']    ← Alice 문장이 아님
-
-# ✅ 정답 — direct 를 씀
-[w for w, t in direct_tagged if t.startswith('NN')]
-# ['Alice', 'studies', 'language', 'models']
-# --8<-- [end:en_pos_trap]
-
-#! 앞 셀에서 복사해 오면서 변수명을 안 바꿨음.
-#! 결과가 그럴듯하게 나와서 눈치채기 어려웠음.
-
-#! 습관 → 복붙한 뒤 `변수명을 먼저 바꾸고` 실행할 것.
-
 
 #== 영어 — 개체명 인식 (NER)
 
@@ -335,7 +304,7 @@ from nltk import ne_chunk
 from nltk.tree import Tree
 
 tree = ne_chunk(tagged)
-#(1)> 반환: Tree 객체. 품사 붙은 토큰에서 사람·지역·기관을 묶어 줌
+# 반환: Tree 객체. 품사 붙은 토큰에서 사람·지역·기관을 묶어 줌
 #(1)> (S
 #(1)>   (PERSON Barack/NNP)      ← 개체로 묶인 건 자식 Tree
 #(1)>   (PERSON Obama/NNP)
@@ -346,29 +315,18 @@ def extract_named_entities(chunk_tree):
     entities = []
     for node in chunk_tree:
         if isinstance(node, Tree):
-            #(2)> ★ Tree 인 것만 개체명. 튜플은 그냥 단어라 건너뜀
+            #(2)> Tree 인 것만 개체명. 튜플은 그냥 단어라 건너뜀
             entities.append((node.label(), " ".join(w for w, _ in node.leaves())))
     return entities
 
 # [('PERSON','Barack'), ('PERSON','Obama'), ('GPE','New York')]
 # --8<-- [end:en_ner]
 
-#! 직접 돌려서 확인한 값임.
-
 #! Tree 구조 → 루트는 항상 `S`(문장).
 #! 개체명으로 잡힌 연속 토큰만 하위 Tree 로 묶이고, 나머지는 튜플로 평평하게 남음.
 #! 그래서 `isinstance(node, Tree)` 로 걸러내는 것.
-
 #! `label()` = 개체 종류 (PERSON·GPE·ORGANIZATION)
 #! `leaves()` = 그 안의 (단어, 태그) 목록. 단어만 뽑아 이어붙임
-
-#! ★ 결과가 완벽하지 않음. 확인해보니
-#! `Barack` 과 `Obama` 가 `따로` 잡힘. 한 사람인데 두 개로.
-#! `Google` 은 NNP 로 태그됐는데 개체명으로는 `안 잡힘`.
-#! 통계 모델이라 그럼. 문맥에 따라 결과가 달라짐.
-
-#! → NER 결과를 그대로 믿고 자동화하면 안 됨. 검토가 필요함.
-
 
 #== 영어 — 어간(stem) vs 표제어(lemma)
 #> 둘 다 "원형으로 되돌리기" 인데 방식이 완전히 다름.
@@ -379,8 +337,8 @@ from nltk.stem import PorterStemmer, WordNetLemmatizer
 st, lm = PorterStemmer(), WordNetLemmatizer()
 
 [st.stem(w) for w in ["running","beautiful","believes","organization","studies"]]
-#(1)> ['run', 'beauti', 'believ', 'organ', 'studi']
-#(1)> ★ 사전에 없는 형태가 나옴. beauti · believ · studi
+# ['run', 'beauti', 'believ', 'organ', 'studi']
+#(1)> 사전에 없는 형태가 나옴. beauti · believ · studi
 #(1)> 규칙으로 접미사를 자를 뿐이라 그럼. 빠르지만 거침
 
 lm.lemmatize("children", pos="n")   # 'child'
@@ -390,7 +348,7 @@ lm.lemmatize("better", pos="a")     # 'good'
 
 lm.lemmatize("running")             # 'running'   ← 안 바뀜
 lm.lemmatize("running", pos="v")    # 'run'
-#(3)> ★ 품사를 안 주면 기본값이 명사. 동사는 pos="v" 를 꼭 줄 것
+#(3)> 품사를 안 주면 기본값이 명사. 동사는 pos="v" 를 꼭 줄 것
 # --8<-- [end:stem_lemma]
 
 #! 전부 직접 돌려서 확인한 값임.
@@ -420,9 +378,7 @@ def penn_to_wordnet(tag):
 #! pos_tag 는 Penn Treebank (NN·VBD·JJ...)
 #! lemmatize 는 WordNet ("n"·"v"·"a"·"r")
 #! 그대로 넘기면 안 되니 변환 함수가 필요함.
-
 #! 마지막 `return "n"` 이 중요함. 모르는 태그는 명사로 처리.
-#! 없으면 None 이 넘어가서 에러가 남.
 
 
 #== 영어 — 불용어와 필터링
@@ -439,7 +395,7 @@ filtered = [
     and word.lower() not in english_stopwords
     #(2)> 소문자로 바꿔서 비교. "The" 와 "the" 를 같이 처리
     and tag.startswith(allowed_prefixes)
-    #(3)> ★ startswith 는 튜플을 받음. 여러 접두사를 한 번에 검사
+    #(3)> startswith 는 튜플을 받음. 여러 접두사를 한 번에 검사
 ]
 # --8<-- [end:en_filter]
 
@@ -457,15 +413,15 @@ filtered = [
 #== 한국어 vs 영어 정리
 
 # --8<-- [start:ko_vs_en]
-#                 한국어 (Kiwi)              영어 (NLTK)
-# 문장 분리       split_into_sents           문장 분리 후 토큰화 권장
-# 단어 쪼개기     tokenize (형태소 분석)      TreebankWordTokenizer
-# 품사            NNG·NNP·SL·VV·VA           NN·VB·JJ·RB 계열
-# 태그 비교       base_tag() 로 앞부분        startswith() 로 계열
-# 원형 복원       분석 결과가 이미 어근        stem 또는 lemmatize
-# 소문자 처리     필요 없음                   .lower() 필요
-# 구두점          SF 태그로 걸러짐            isalpha() 로 걸러야 함
-# 개체명          별도 도구 필요              ne_chunk
+                 한국어 (Kiwi)              영어 (NLTK)
+ 문장 분리       split_into_sents           문장 분리 후 토큰화 권장
+ 단어 쪼개기     tokenize (형태소 분석)      TreebankWordTokenizer
+ 품사            NNG·NNP·SL·VV·VA           NN·VB·JJ·RB 계열
+ 태그 비교       base_tag() 로 앞부분        startswith() 로 계열
+ 원형 복원       분석 결과가 이미 어근        stem 또는 lemmatize
+ 소문자 처리     필요 없음                   .lower() 필요
+ 구두점          SF 태그로 걸러짐            isalpha() 로 걸러야 함
+ 개체명          별도 도구 필요              ne_chunk
 # --8<-- [end:ko_vs_en]
 
 #! 큰 차이 하나 → `한국어는 형태소 분석이 대부분을 해결함`.
@@ -476,35 +432,12 @@ filtered = [
 #! 영어는 `text.split()` 만으로도 어느 정도 됨.
 
 
-#== 오늘 틀린 것 모음
-
-#! ① N-gram 을 문장 경계 없이 만듦 → ('검색','모델') 같은 가짜 조합이 생김
-#! ② mission_token_sets 에 `tagged` 를 넣음 → `tokens` 여야 함
-#! ③ 영어 명사 추출에서 다른 문장의 `fill_tagged` 를 씀 → `direct_tagged`
-
-#! ①②③ 공통점 → `문제 지문을 끝까지 안 읽음`.
-#! "문장별", "토큰 집합", 변수명이 다 지문에 적혀 있었음.
-
-#! 그리고 셋 다 `에러가 안 남`. 결과가 그럴듯하게 나와서 더 위험함.
-#! 습관 → 결과를 기대값과 눈으로 대조할 것. 개수부터 세어볼 것.
-
-
 #== 정리
 
 #! 흐름  정규화 → 문장 분리 → 형태소 분석 → 품사 선택 → 불용어 제거 → 빈도
 #! Kiwi  split_into_sents(문장) · tokenize(형태소) · token.form / token.tag
 #! 태그  NNG NNP SL(명사) · VV VA(동사·형용사 어근) · 나머지는 조사·어미
 #! base_tag  태그에 붙은 -R, +EC 를 떼어내고 비교
-#! 하다 파생  분석하다 = 분석(NNG) + 하(XSV). VV 가 아님
 #! N-gram  문장별로 만들 것. 경계를 넘으면 없던 조합이 생김
 #! 영어  Treebank(문법 규칙) vs WordPunct(기계적) · stem(규칙) vs lemma(사전)
 #! lemma  품사를 안 주면 명사로 처리됨. 동사는 pos="v" 필수
-
-#! 감각 하나 → `전처리 결과는 항상 눈으로 볼 것`.
-#! 중간 결과를 print 해서 조사가 남았는지, 이상한 게 섞였는지 확인.
-
-
-#? Kiwi 사용자 사전에 도메인 단어를 추가하는 법 (MCP, 에이전트 같은 것)
-#? 전처리한 토큰으로 문서-단어 행렬을 만드는 법 (numpy 노트와 연결)
-#? 임베딩을 쓸 거면 전처리를 어디까지 해야 하는지
-#? 한국어 개체명 인식은 어떤 도구를 쓰는지
