@@ -111,7 +111,9 @@ def parse(src, skip=0):
                 else:
                     body.append(("prose", text, None))
             elif tag == "!":
-                if body and body[-1][0] == "warn":
+                # 직전이 warn 이고, 그 사이에 쌓인 코드가 없을 때만 합친다.
+                # (코드가 껴 있으면 flush 해서 별도 박스로 분리)
+                if body and body[-1][0] == "warn" and not code:
                     merged = body[-1][1] + ([text] if text else [])
                     body[-1] = ("warn", merged, None)
                 else:
