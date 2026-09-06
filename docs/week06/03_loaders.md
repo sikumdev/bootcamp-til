@@ -1,5 +1,5 @@
 ---
-title: 문서 로딩 — PDF · 웹 · JSON · CSV 로더
+title: 문서 로딩
 date: 2026-09-02
 tags: [rag]
 ---

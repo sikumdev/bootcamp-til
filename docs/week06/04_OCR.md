@@ -1,5 +1,5 @@
 ---
-title: OCR 개념 — PDF를 그림으로 만들어 읽고, 구조까지 되살리기
+title: OCR 개념 
 date: 2026-09-03
 tags: [ocr]
 ---
