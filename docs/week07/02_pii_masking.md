@@ -1,12 +1,12 @@
 ---
 title: 개인정보 보호 RAG — 정규식으로 PII 탐지·마스킹하고 안전한 Document 만들기
-date: 2026-09-07
+date: 2026-09-08
 tags: [regex]
 ---
 
 # 개인정보 보호 RAG — 정규식으로 PII 탐지·마스킹하고 안전한 Document 만들기
 
-> 원본 코드: [`02_pii_masking.py`](02_pii_masking.py)
+> 원본 코드: [`02_pii.py`](02_pii.py)
 
 ## PII 가 뭔지부터
 
@@ -247,6 +247,25 @@ for label, text in quality_cases.items():
     빡빡하게 조이면 이번엔 변형된 진짜 PII(공백 전화번호 등)를 더 많이 놓치게 됨. 누락과 과다는 트레이드오프 관계라서  
     정규식 하나로 둘 다 완벽히 잡을 순 없고, 결국 사람 이름처럼 서술형 PII 는 NER 같은 별도 모델이 필요하다는 결론.
 
+## 전화번호 패턴 확장 — 공백 표기 누락을 실제로 메꿔봄
+
+위에서 "phone_with_spaces 는 누락된다"고 확인만 하고 넘어갔는데, 개인실습에서 그 누락을 실제로 고쳐봄.<br>하이픈 자리에 공백도 올 수 있게 문자 클래스를 넓히면 됨. `[ -]` 는 "공백 한 칸 또는 하이픈 한 개" 라는 뜻.
+
+<div class="til-code" markdown>
+```python hl_lines="5"
+extended_phone_pattern = re.compile(r"(?<!\d)01[016789][ -]\d{3,4}[ -]\d{4}(?!\d)")
+ 
+assert extended_phone_pattern.search("연락처 010-1234-5678")
+assert extended_phone_pattern.search("연락처 010 1234 5678")
+assert extended_phone_pattern.search("ORD-2026-0001") is None
+```
+<div class="til-note" data-til-line="5" hidden>주문번호는 여전히 안 잡힘. `01` 로 시작하지 않아서 `01[016789]` 부분부터 매칭이 안 됨 → 오탐 걱정 없이 확장된 것 확인함.</div>
+</div>
+
+!!! note "확장은 됐고, account 는 보류"
+    `-` 하나만 문자 클래스로 바꿨을 뿐인데 누락 하나가 없어짐. 근데 이 확장을 `PII_PATTERNS["phone"]` 에 바로 반영하면  
+    계좌번호 패턴(`account`) 쪽 문자 클래스도 공백 표기까지 넓혀야 하나 고민됨 → 지금은 전화번호만 확장
+
 ## 전체 파이프라인으로 묶기
 
 <div class="til-code" markdown>
@@ -335,3 +354,20 @@ assert masking_report[2]["masked_fields"] == ["contact_phone", "customer_name"]
 !!! note "딕셔너리 대신 정렬된 리스트로"
     리포트 함수를 짤 때 처음엔 remaining_text_pii 에 validation["text_pii"] (딕셔너리)를 그대로 넣으려다가,  
     과제 요구사항이 "정렬한 목록" 이라길래 sorted(validation["text_pii"]) 로 키만 뽑아서 리스트로 바꿈.
+
+## 색인 문서 + 운영 보고서를 한 번에 — safe_index_pipeline
+
+prepare_documents_for_index() 는 "색인해도 되는 Document 리스트"만 주고,<br>build_masking_report() 는 "뭘 지웠는지 보고서"만 줌. 실제로 파이프라인에 넣을 땐 이 둘을 같이 써야 하는 경우가 많아서<br>두 함수를 그대로 재사용해서 하나로 묶는 함수를 개인실습에서 만들어봄.
+
+<div class="til-code" markdown>
+```python hl_lines="4"
+def safe_index_pipeline(documents):
+    return {
+        "documents": prepare_documents_for_index(documents),
+        "report": build_masking_report(documents),
+    }
+ 
+pipeline_result = safe_index_pipeline(raw_documents)
+```
+<div class="til-note" data-til-line="4" hidden>보고서는 원본 documents 를 다시 받아서 별도로 만듦</div>
+</div>
